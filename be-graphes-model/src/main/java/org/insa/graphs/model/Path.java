@@ -29,13 +29,29 @@ public class Path {
      * 
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
-     * 
-     * @deprecated Need to be implemented.
      */
     public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
         // TODO:
+        if (nodes.size() > 1) {
+        	List<Node> sublistNodes = nodes.subList(1,nodes.size());
+        	Node noeud1 = nodes.get(0);
+        	for (Node noeud2 : sublistNodes) {
+        		double timeMin = Float.MAX_VALUE;
+        		Arc arcMin = null;
+        		for (Arc arcActuel : noeud1.getSuccessors()) {
+        			if (arcActuel.getDestination()==noeud2 && arcActuel.getMinimumTravelTime()<timeMin) {
+        				arcMin = arcActuel;
+        				timeMin = arcActuel.getMinimumTravelTime();
+        			}
+        		}
+        		if (arcMin != null)	arcs.add(arcMin);
+        		else throw new IllegalArgumentException("Problem with list nodes: two consecutive nodes in the list are not connected in the graph");
+        		noeud1 = noeud2;
+        	}
+        } else if (nodes.size() == 0) return new Path(graph);
+        else return new Path(graph, nodes.get(0));
         return new Path(graph, arcs);
     }
 
@@ -50,13 +66,29 @@ public class Path {
      * 
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
-     * 
-     * @deprecated Need to be implemented.
      */
     public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
         // TODO:
+        if (nodes.size() > 1) {
+        	List<Node> sublistNodes = nodes.subList(1,nodes.size());
+        	Node noeud1 = nodes.get(0);
+        	for (Node noeud2 : sublistNodes) {
+        		float lengthMin = Float.MAX_VALUE;
+        		Arc arcMin = null;
+        		for (Arc arcActuel : noeud1.getSuccessors()) {
+        			if (arcActuel.getDestination()==noeud2 && arcActuel.getLength()<lengthMin) {
+        				arcMin = arcActuel;
+        				lengthMin = arcActuel.getLength();
+        			}
+        		}
+        		if (arcMin != null)	arcs.add(arcMin);
+        		else throw new IllegalArgumentException("Problem with list nodes");
+        		noeud1 = noeud2;
+        	}
+        } else if (nodes.size() == 0) return new Path(graph);
+        else return new Path(graph, nodes.get(0));
         return new Path(graph, arcs);
     }
 
@@ -205,13 +237,12 @@ public class Path {
     	if (this.isEmpty()) cond = true;
     	else if (listArcs.isEmpty() && this.size()==1) cond = true;
     	else if (this.getOrigin() == listArcs.get(0).getOrigin()) {
-    		int i = 0;
-    		Node prevDest = listArcs.get(0).getOrigin();
-    		for (Arc a: listArcs) {
+    		Node prevDest = listArcs.get(0).getDestination();
+    		List<Arc> sublistArcs = listArcs.subList(1, listArcs.size());
+    		for (Arc a: sublistArcs) { // Parcours de la liste des arcs à partir du second pour comparer au précédent
     			cond = (prevDest==a.getOrigin());
     			prevDest = a.getDestination();
-    			i++;
-    			if (i == 2 || cond == false) break;
+    			if (cond == false) break;
     		}
     	}
         return cond;
@@ -252,8 +283,6 @@ public class Path {
      * on every arc.
      * 
      * @return Minimum travel time to travel this path (in seconds).
-     * 
-     * @deprecated Need to be implemented.
      */
     public double getMinimumTravelTime() {
         // TODO:
