@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @author DLB
  */
 public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
-
+	
 	// Number of elements in heap.
 	private int currentSize;
 

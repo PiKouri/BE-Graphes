@@ -1,7 +1,7 @@
 package org.insa.graphs.model;
-import java.util.ArrayList;
+// import java.util.ArrayList;
 
-public class Label {
+public class Label implements Comparable<Label> {
 	
 	/**
      * Create a new label on the given node and add it to the list of Labels.
@@ -9,7 +9,7 @@ public class Label {
      * @param currentNode Node to label.
      * @param marked Is true if the shortest path is known for this node.
      * @param cost Current cost of the shortest path from the origin to this node.
-     * @param parent Previous Node in the current shortest path.
+     * @param parent Previous Node in the current shortest path (Arc).
      */
 	public Label(Node currentNode, boolean marked, double cost, Arc parent) {
 		this.currentNode=currentNode;
@@ -48,7 +48,7 @@ public class Label {
 	/**
      * @return The previous node in the current shortest path.
     */
-	public Arc getParent() { return parent;	}	
+	public Arc getParent() { return this.parent; }	
 	
 	/**
 	 * Change the current labeled node as marked
@@ -64,4 +64,8 @@ public class Label {
 	 * Set the parent
 	 */
 	public void setParent(Arc newParent) { this.parent = newParent; }
+	
+	public int compareTo(Label other) {
+        return Double.compare(this.getCost(), other.getCost());		
+	}
 }
