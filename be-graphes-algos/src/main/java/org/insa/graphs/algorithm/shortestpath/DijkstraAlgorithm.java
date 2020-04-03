@@ -86,10 +86,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 						labelY.setParent(arcXY);
 						listLabels[yId]=labelY;
 						try {
-							//heap.remove(y);
+							heap.remove(labelY);
 							heap.insert(labelY);
 						} catch (ElementNotFoundException e) {
-							//heap.insert(y);
+							heap.insert(labelY);
 						}
 					}
 				}
