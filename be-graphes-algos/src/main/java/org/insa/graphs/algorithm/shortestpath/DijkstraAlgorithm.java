@@ -51,8 +51,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 		}
 		Node s = data.getOrigin();
 		listLabels[s.getId()].setCost(0);
-		Label labelS = listLabels[s.getId()];
-		heap.insert(labelS); 
+		heap.insert(listLabels[s.getId()]); 
 		// Le tas ne contient que le sommet d'origine initialement
 		Node d = data.getDestination();
 		
@@ -72,18 +71,14 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 				break;
 			}
 			
-			Label labelX = heap.deleteMin();
-			Node x = labelX.getCurrentNode();
+			Node x = heap.deleteMin().getCurrentNode();
 			
-			int xId = x.getId();
-			labelX.mark();
+			listLabels[x.getId()].mark();
 			// Notify observers that node x is marked.
 			notifyNodeMarked(x);
 			
 			// On arrête lorsque le node destination est marqué
 			if (x == d) break;
-			
-			listLabels[xId] = labelX;
 			
 			int nbSuccesseursExplores = 0;
 			
@@ -94,38 +89,36 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                     continue;
                 }
 				Node y = arcXY.getDestination();
-				int yId = y.getId();
-				Label labelY = listLabels[yId];
-				if (!(labelY.isMarked())) {
+				
+				if (!(listLabels[y.getId()].isMarked())) {
 					
 					nbSuccesseursExplores ++;
 					
 					double wXY = data.getCost(arcXY);
-					double oldDistance = labelY.getCost();
-                    double newDistance = labelX.getCost()+wXY;
+					double oldDistance = listLabels[y.getId()].getCost();
+                    double newDistance = listLabels[x.getId()].getCost()+wXY;
 
                     if (Double.isInfinite(oldDistance) && Double.isFinite(newDistance)) {
                         notifyNodeReached(y);
                     }
                     
 					if (oldDistance > newDistance) {
-						labelY.setCost(newDistance);
-						labelY.setParent(arcXY);
-						listLabels[yId]=labelY;
+						listLabels[y.getId()].setCost(newDistance);
+						listLabels[y.getId()].setParent(arcXY);
 						try {
-							heap.remove(labelY);
-							heap.insert(labelY);
+							heap.remove(listLabels[y.getId()]);
+							heap.insert(listLabels[y.getId()]);
 						} catch (ElementNotFoundException e) {
-							heap.insert(labelY);
+							heap.insert(listLabels[y.getId()]);
 						}
 					}
 				}
 			}
 			// Affichage du nombre de successeurs explorés comparé au nombre total de successeurs
-			System.out.println("Node "+xId+": "+nbSuccesseursExplores+"/"+x.getNumberOfSuccessors()+" Successeurs explorés");
+			System.out.println("Node "+x.getId()+": "+nbSuccesseursExplores+"/"+x.getNumberOfSuccessors()+" Successeurs explorés");
 			
 			// Coût des labels marqués croissant au cours des itérations
-			System.out.println("Cost: " + labelX.getCost()); 
+			System.out.println("Cost: " + listLabels[x.getId()].getCost()); 
 		}
 		
 		// Création de la ShortestPathSolution
