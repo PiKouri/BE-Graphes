@@ -122,6 +122,23 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 	public boolean isEmpty() {
 		return this.currentSize == 0;
 	}
+	
+	/**
+     * Return true if the Binary Heap is valid
+     */
+	public boolean isValid() {
+		// Si le tas n'est pas vide, appel de la fonction récursive à partir de la racine | Arrêt lorsque l'on atteint les feuilles
+		return isEmpty() || recursiveIsElementValid(0);
+	}
+	
+	private boolean recursiveIsElementValid(int index) {
+		boolean result = true;
+		// Si l'element a un fils de droite, vérifie qu'il est plus petit que lui et puis vérifie que le fils en question est valide 
+		if (indexLeft(index)+1<currentSize) result &= (array.get(index).compareTo(array.get(indexLeft(index)+1))<=0) && (recursiveIsElementValid(indexLeft(index)+1));
+		// De même avec le fils de gauche
+		if (indexLeft(index)<currentSize) result &= (array.get(index).compareTo(array.get(indexLeft(index)))<=0) && (recursiveIsElementValid(indexLeft(index)));
+		return result;
+	}
 
 	@Override
 	public int size() {

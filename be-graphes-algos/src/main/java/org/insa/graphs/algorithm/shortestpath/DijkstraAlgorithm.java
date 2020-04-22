@@ -44,6 +44,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 		
 		// Initialisation 
 
+		int nbIterations = 0;
 		double inf = Double.POSITIVE_INFINITY;
 		for (Node node : nodes) {
 			listLabels[node.getId()] = new Label(node, false, inf, null);
@@ -51,27 +52,54 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 		Node s = data.getOrigin();
 		listLabels[s.getId()].setCost(0);
 		Label labelS = listLabels[s.getId()];
-		heap.insert(labelS); // Le tas ne contient que le sommet d'origine initialement
+		heap.insert(labelS); 
+		// Le tas ne contient que le sommet d'origine initialement
+		Node d = data.getDestination();
+		
+		// Notify observers about the first event (origin processed).
+        notifyOriginProcessed(s);
 
 		// Itérations
 
 		while (!(heap.isEmpty())) {
+			// Incrémentation du compteur d'itérations
+			nbIterations++;
+			
+			//Affichage de la validité du tas
+			if(heap.isValid()) System.out.println("Tas valide");
+			else {
+				System.out.println("Tas invalide -> Arrêt de l'algorithme");
+				break;
+			}
+			
 			Label labelX = heap.deleteMin();
 			Node x = labelX.getCurrentNode();
+			
 			int xId = x.getId();
-			System.out.println("Node "+xId);
 			labelX.mark();
+			// Notify observers that node x is marked.
+			notifyNodeMarked(x);
+			
+			// On arrête lorsque le node destination est marqué
+			if (x == d) break;
+			
 			listLabels[xId] = labelX;
-			//System.out.println(heap.toStringTree());
+			
+			int nbSuccesseursExplores = 0;
+			
 			for (Arc arcXY : x.getSuccessors()) {
-				// Small test to check allowed roads...
-                if (!data.isAllowed(arcXY)) {
+				
+				// Vérification du mode de transport
+                if (!data.isAllowed(arcXY)) { 
                     continue;
                 }
 				Node y = arcXY.getDestination();
 				int yId = y.getId();
 				Label labelY = listLabels[yId];
 				if (!(labelY.isMarked())) {
+					
+					nbSuccesseursExplores ++;
+					
 					double wXY = data.getCost(arcXY);
 					double oldDistance = labelY.getCost();
                     double newDistance = labelX.getCost()+wXY;
@@ -81,7 +109,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                     }
                     
 					if (oldDistance > newDistance) {
-						System.out.println("----Node "+yId+" : "+oldDistance + " par " + newDistance);
 						labelY.setCost(newDistance);
 						labelY.setParent(arcXY);
 						listLabels[yId]=labelY;
@@ -94,18 +121,23 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 					}
 				}
 			}
+			// Affichage du nombre de successeurs explorés comparé au nombre total de successeurs
+			System.out.println("Node "+xId+": "+nbSuccesseursExplores+"/"+x.getNumberOfSuccessors()+" Successeurs explorés");
+			
+			// Coût des labels marqués croissant au cours des itérations
+			System.out.println("Cost: " + labelX.getCost()); 
 		}
 		
 		// Création de la ShortestPathSolution
 		
 		ArrayList<Arc> arcs = new ArrayList<>();
-		Node i = data.getDestination();
+		Node i = d;
 		Label labelI = listLabels[i.getId()];
 		if (labelI.getParent()==null) {
 			solution = new ShortestPathSolution(data, Status.INFEASIBLE);
         } else {
         	// The destination has been found, notify the observers.
-            notifyDestinationReached(data.getDestination());
+            notifyDestinationReached(d);
             
         	while (i != s) {
         		labelI = listLabels[i.getId()];
@@ -119,6 +151,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
             // Create the final solution.
             solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
         }
+		// Nombre d'arcs du plus court chemin et nombre d'itérations de l'algorithme
+		System.out.println("Nombre d'arcs du PCC : " + arcs.size());
+		System.out.println("Nombre d'itérations de l'algorithme : " +nbIterations);
 		
 		return solution;
 
