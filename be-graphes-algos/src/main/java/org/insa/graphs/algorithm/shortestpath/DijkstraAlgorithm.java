@@ -64,14 +64,14 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 			// Incrémentation du compteur d'itérations
 			nbIterations++;
 			
+			Node x = heap.deleteMin().getCurrentNode();
+			
 			//Affichage de la validité du tas
-			if(heap.isValid()) System.out.println("Tas valide");
+			/* if(heap.isValid()) System.out.println("Tas valide");
 			else {
 				System.out.println("Tas invalide -> Arrêt de l'algorithme");
 				break;
-			}
-			
-			Node x = heap.deleteMin().getCurrentNode();
+			} */
 			
 			listLabels[x.getId()].mark();
 			// Notify observers that node x is marked.
@@ -85,7 +85,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 			for (Arc arcXY : x.getSuccessors()) {
 				
 				// Vérification du mode de transport
-                if (!data.isAllowed(arcXY)) { 
+                if (!(data.isAllowed(arcXY))) { 
                     continue;
                 }
 				Node y = arcXY.getDestination();
@@ -102,15 +102,13 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                         notifyNodeReached(y);
                     }
                     
-					if (oldDistance > newDistance) {
+					if (oldDistance >= newDistance) {
 						listLabels[y.getId()].setCost(newDistance);
 						listLabels[y.getId()].setParent(arcXY);
 						try {
 							heap.remove(listLabels[y.getId()]);
-							heap.insert(listLabels[y.getId()]);
-						} catch (ElementNotFoundException e) {
-							heap.insert(listLabels[y.getId()]);
-						}
+						} catch (ElementNotFoundException e) {}
+						heap.insert(listLabels[y.getId()]);
 					}
 				}
 			}
