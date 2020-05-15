@@ -128,9 +128,18 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 	/**
      * Return true if the Binary Heap is valid
      */
-	/* public boolean isValid() {
+	 /* public boolean isValid() {
 		// Si le tas n'est pas vide, appel de la fonction récursive à partir de la racine | Arrêt lorsque l'on atteint les feuilles
-		return isEmpty() || recursiveIsElementValid(0);
+		boolean ok = true;
+		for (int index = 0; index<this.currentSize; index++) {
+			// Si l'element a un fils de droite, vérifie qu'il est plus petit que lui
+			if ((this.indexLeft(index)+1)<this.currentSize) ok &= (((this.array.get(index)).compareTo(this.array.get(this.indexLeft(index)+1))<=0));
+			// De même avec le fils de gauche
+			if (this.indexLeft(index)<this.currentSize) ok &= ((this.array.get(index).compareTo(this.array.get(this.indexLeft(index)))<=0));
+			if (!ok) break;
+		}
+		return ok;
+		//return isEmpty() || recursiveIsElementValid(0);
 	}
 	
 	private boolean recursiveIsElementValid(int index) {
