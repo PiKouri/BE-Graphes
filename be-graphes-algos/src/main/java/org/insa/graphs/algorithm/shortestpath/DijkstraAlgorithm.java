@@ -1,7 +1,7 @@
 package org.insa.graphs.algorithm.shortestpath;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +30,16 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
 		// Retrieve the graph.
 		Graph graph = data.getGraph();
+		
+		Node s = data.getOrigin();
+		Node d = data.getDestination();
 
+		// Verification du cas simple : Graphe vide
+		if (graph.getNodes().size() == 0) return new ShortestPathSolution(data, Status.INFEASIBLE);
+		
+		// Verification du cas simple : Origine = destination
+		if (s == d) return new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, new ArrayList<Arc>())); 
+		
 		final int nbNodes = graph.size();
 
 		final List<Node> nodes = graph.getNodes();
@@ -49,11 +58,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 		for (Node node : nodes) {
 			listLabels[node.getId()] = new Label(node, false, inf, null);
 		}
-		Node s = data.getOrigin();
 		listLabels[s.getId()].setCost(0);
 		heap.insert(listLabels[s.getId()]); 
 		// Le tas ne contient que le sommet d'origine initialement
-		Node d = data.getDestination();
+		
 		
 		// Notify observers about the first event (origin processed).
         notifyOriginProcessed(s);
@@ -112,6 +120,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 					}
 				}
 			}
+			
 			// Affichage du nombre de successeurs explorés comparé au nombre total de successeurs
 			System.out.println("Node "+x.getId()+": "+nbSuccesseursExplores+"/"+x.getNumberOfSuccessors()+" Successeurs explorés");
 			

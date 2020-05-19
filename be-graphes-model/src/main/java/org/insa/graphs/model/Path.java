@@ -234,15 +234,17 @@ public class Path {
         // TODO:
     	boolean cond = false;
     	List<Arc> listArcs = this.getArcs();
-    	if (this.isEmpty()) cond = true;
-    	else if (listArcs.isEmpty() && this.size()==1) cond = true;
+    	if (this.isEmpty() || (listArcs.isEmpty() && this.size()==1)) cond = true;
     	else if (this.getOrigin() == listArcs.get(0).getOrigin()) {
-    		Node prevDest = listArcs.get(0).getDestination();
-    		List<Arc> sublistArcs = listArcs.subList(1, listArcs.size());
-    		for (Arc a: sublistArcs) { // Parcours de la liste des arcs à partir du second pour comparer au précédent
-    			cond = (prevDest==a.getOrigin());
-    			prevDest = a.getDestination();
-    			if (cond == false) break;
+    		if (this.size()==2) cond = true;
+    		else {
+	    		Node prevDest = listArcs.get(0).getDestination();
+	    		List<Arc> sublistArcs = listArcs.subList(1, listArcs.size());
+	    		for (Arc a: sublistArcs) { // Parcours de la liste des arcs à partir du second pour comparer au précédent
+	    			cond = (prevDest==a.getOrigin());
+	    			prevDest = a.getDestination();
+	    			if (cond == false) break;
+	    		}
     		}
     	}
         return cond;
@@ -294,6 +296,14 @@ public class Path {
     		}
     	}
         return time;
+    }
+    
+    public String toString() {
+    	String ret = "";
+    	for (Arc a: this.getArcs()) {
+    		ret += "Node " + a.getOrigin().getId() + " -> Node " + a.getDestination().getId() + " | ";
+    	}
+    	return (ret == "") ? "Empty" : ret;
     }
 
 }

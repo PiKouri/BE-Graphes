@@ -9,8 +9,7 @@ import org.insa.graphs.algorithm.*;
 import org.insa.graphs.algorithm.AbstractSolution.Status;
 import org.insa.graphs.model.*;
 import org.insa.graphs.model.RoadInformation.RoadType;
-import org.insa.graphs.algorithm.shortestpath.ShortestPathData;
-import org.insa.graphs.algorithm.shortestpath.DijkstraAlgorithm;
+import org.insa.graphs.algorithm.shortestpath.*;
 import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public class DijkstraTest {
     private static Graph notConnectedGraph, defaultGraph, singleNodeGraph, emptyGraph;
     
     // Some ArcInspectors
-    private static ArcInspector AI0, AI2;
+    private static ArcInspector [] arcInspectors;
     
     // Precision in doubles' comparison during test
     private static double precision = 0.5;
@@ -68,52 +67,78 @@ public class DijkstraTest {
 
         defaultGraph = new Graph("ID", "", Arrays.asList(nodes), null);
         emptyGraph = new Graph("ID", "", new ArrayList<Node>(), null);
-        singleNodeGraph = new Graph("ID", "", Arrays.asList(new Node[] {nodes[0]}), null);
-        notConnectedGraph = new Graph("ID", "", Arrays.asList(new Node[] {nodes[0], nodes[1], nodes[5]}), null);
-
-        emptyPath = new Path(defaultGraph, new ArrayList<Arc>());
-        singleNodePath = new Path(defaultGraph, nodes[1]);
-        shortPath = new Path(defaultGraph, Arrays.asList(new Arc[] { a2b, b2c, c2d_1 }));
-        longPath = new Path(defaultGraph, Arrays.asList(new Arc[] { a2b, b2c, c2d_1, d2e }));
-        loopPath = new Path(defaultGraph, Arrays.asList(new Arc[] { a2b, b2c, c2d_1, d2a }));
-        longLoopPath = new Path(defaultGraph,
-                Arrays.asList(new Arc[] { a2b, b2c, c2d_1, d2a, a2c, c2d_3, d2a, a2b, b2c }));
-        invalidPath = new Path(defaultGraph, Arrays.asList(new Arc[] { a2b, c2d_1, d2e }));
         
-		AI0 = ArcInspectorFactory.getAllFilters().get(0); // Premier ArcInspector = piétons + vélos
-		AI2 = ArcInspectorFactory.getAllFilters().get(2); // Troisième ArcInspector = voitures
+        arcInspectors = new ArcInspector[2];
+		arcInspectors[0] = ArcInspectorFactory.getAllFilters().get(0); // Premier ArcInspector = piétons + vélos
+		arcInspectors[1] = ArcInspectorFactory.getAllFilters().get(2); // Troisième ArcInspector = voitures
 
     }
     
     @Test
-    public void defaultTest() {
-    	Node debut = nodes[0];
-    	Node fin = nodes[2];
-    	List <Node> list = Arrays.asList(new Node[]{debut,fin});
-		
-    	DijkstraTest.data = new ShortestPathData(defaultGraph, debut, fin, AI0);
-        assertEquals(Path.createShortestPathFromNodes(defaultGraph, list).getLength(), (new DijkstraAlgorithm(data)).run().getPath().getLength(), precision);
-        
-        DijkstraTest.data = new ShortestPathData(defaultGraph, debut, fin, AI2);
-        assertEquals(Path.createShortestPathFromNodes(defaultGraph, list).getMinimumTravelTime(), (new DijkstraAlgorithm(data)).run().getPath().getMinimumTravelTime(), precision);
+    public void testIsValidDefaultGraph() {
+    	for (int index=0; index < nodes.length; index++) {
+    		for (int index2=0; index2 < nodes.length; index2++) {
+    			System.out.printf("\nNode %d vers Node %d\n", index, index2);
+    			Node debut = nodes[index];
+    			Node fin = nodes[index2];
+				
+    			for (ArcInspector AI : arcInspectors) {
+			    	DijkstraTest.data = new ShortestPathData(defaultGraph, debut, fin, AI);
+			    	ShortestPathSolution Solution = (new DijkstraAlgorithm(data)).run();
+			    	if (Solution.isFeasible()) assertEquals(true, Solution.getPath().isValid());
+			    	/*Path Path = Solution.getPath();
+			    	System.out.println("Path " + Path.toString());
+			    	if (Path.getOrigin() != null) System.out.println("Get origin :" + Path.getOrigin().getId());
+			    	if (!Path.isEmpty()) System.out.println("Get Destination :" + ((Path.getArcs()).get(Path.getArcs().size()-1)).getDestination().getId());*/
+    			}
+		    }
+    	}
     }
     
 	@Test
-    public void testDistanceCheminInexistant() {
+    public void testIsValidCheminInexistant() {
 		Node debut = nodes[0];
     	Node fin = nodes[5];
-		
-    	DijkstraTest.data = new ShortestPathData(defaultGraph, debut, fin, AI0);
-        assertEquals(Status.INFEASIBLE,(new DijkstraAlgorithm(data)).run().getStatus());
-        
-        DijkstraTest.data = new ShortestPathData(defaultGraph, debut, fin, AI2);
-        assertEquals(Status.INFEASIBLE,(new DijkstraAlgorithm(data)).run().getStatus());
+    	for (ArcInspector AI : arcInspectors) {
+	    	DijkstraTest.data = new ShortestPathData(defaultGraph, debut, fin, AI);
+	    	assertEquals(Status.INFEASIBLE,(new DijkstraAlgorithm(data)).run().getStatus());
+		}		        
     }
-    
+	
 	@Test
-	public void testCarreTemps() {
-		assertEquals(0,0);
-		//fail("Not yet implemented");
-	}
+    public void testIsValidEmptyGraph() {
+		for (int index=0; index < nodes.length-1; index++) {
+    		for (int index2=0; index2 < nodes.length-1; index2++) {
+    			System.out.printf("\nNode %d vers Node %d\n", index, index2);
+    			Node debut = nodes[index];
+    			Node fin = nodes[index2];
+    			for (ArcInspector AI : arcInspectors) {
+    		    	DijkstraTest.data = new ShortestPathData(emptyGraph, debut, fin, AI);
+    		        assertEquals(Status.INFEASIBLE,(new DijkstraAlgorithm(data)).run().getStatus());
+    			}		        
+    		}
+		}
+    }
+	
+	@Test
+	public void testOptimaliteOracle() {
+		for (int index=0; index < nodes.length; index++) {
+    		for (int index2=0; index2 < nodes.length; index2++) {
+    			System.out.printf("\nNode %d vers Node %d\n", index, index2);
+    			Node debut = nodes[index];
+    			Node fin = nodes[index2];
+				
+    			for (ArcInspector AI : arcInspectors) {
+    		    	DijkstraTest.data = new ShortestPathData(defaultGraph, debut, fin, AI);
+    		    	ShortestPathSolution Solution = (new DijkstraAlgorithm(data)).run();
+    		    	ShortestPathSolution SolutionBellmanFord = (new BellmanFordAlgorithm(data)).run();
+    		    	
+    		    	//assertEquals(SolutionBellmanFord.getStatus(), Solution.getStatus());
 
+    		    	if (Solution.isFeasible() && SolutionBellmanFord.isFeasible()) assertEquals(SolutionBellmanFord.getPath().getLength(), Solution.getPath().getLength(), precision);
+    		    	if (Solution.isFeasible() && SolutionBellmanFord.isFeasible()) assertEquals(SolutionBellmanFord.getPath().getMinimumTravelTime(), Solution.getPath().getMinimumTravelTime(), precision);
+    			}
+    		}
+    	}
+	}
 }
