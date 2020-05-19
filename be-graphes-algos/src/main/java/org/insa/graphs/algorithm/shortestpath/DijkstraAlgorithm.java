@@ -21,7 +21,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	public DijkstraAlgorithm(ShortestPathData data) {
 		super(data);
 	}
-
+	
 	@Override
 	protected ShortestPathSolution doRun() {
 
@@ -46,10 +46,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
 		// Liste des labels
 		// ArrayList<Label> listLabels = new ArrayList<Label>(nbNodes);
-		Label[] listLabels = new Label[nbNodes];
+		Label[] listLabels = createLabelList(nbNodes);
 		
 		// File de priorité
-		BinaryHeap<Label> heap = new BinaryHeap<Label>();
+		BinaryHeap<Label> heap = createLabelHeap();
 		
 		// Initialisation 
 
@@ -75,11 +75,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 			Node x = heap.deleteMin().getCurrentNode();
 			
 			//Affichage de la validité du tas
-			/* if(heap.isValid()) System.out.println("Tas valide");
+			 if(heap.isValid()) System.out.println("Tas valide");
 			else {
 				System.out.println("Tas invalide -> Arrêt de l'algorithme");
 				break;
-			} */
+			} 
 			
 			listLabels[x.getId()].mark();
 			// Notify observers that node x is marked.
@@ -111,11 +111,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
                     }
                     
 					if (oldDistance >= newDistance) {
-						listLabels[y.getId()].setCost(newDistance);
-						listLabels[y.getId()].setParent(arcXY);
 						try {
 							heap.remove(listLabels[y.getId()]);
 						} catch (ElementNotFoundException e) {}
+						listLabels[y.getId()].setCost(newDistance);
+						listLabels[y.getId()].setParent(arcXY);
 						heap.insert(listLabels[y.getId()]);
 					}
 				}
@@ -158,4 +158,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 		return solution;
 
 	}
+	
+	protected Label[] createLabelList (int nbNodes) {return new Label[nbNodes];}
+	protected BinaryHeap<Label> createLabelHeap() {return new BinaryHeap<Label>();}
 }

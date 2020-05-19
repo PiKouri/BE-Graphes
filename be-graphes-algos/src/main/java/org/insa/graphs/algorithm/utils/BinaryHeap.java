@@ -128,9 +128,9 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 	/**
      * Return true if the Binary Heap is valid
      */
-	 /* public boolean isValid() {
+	 public boolean isValid() {
 		// Si le tas n'est pas vide, appel de la fonction récursive à partir de la racine | Arrêt lorsque l'on atteint les feuilles
-		boolean ok = true;
+		/*boolean ok = true;
 		for (int index = 0; index<this.currentSize; index++) {
 			// Si l'element a un fils de droite, vérifie qu'il est plus petit que lui
 			if ((this.indexLeft(index)+1)<this.currentSize) ok &= (((this.array.get(index)).compareTo(this.array.get(this.indexLeft(index)+1))<=0));
@@ -138,8 +138,8 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 			if (this.indexLeft(index)<this.currentSize) ok &= ((this.array.get(index).compareTo(this.array.get(this.indexLeft(index)))<=0));
 			if (!ok) break;
 		}
-		return ok;
-		//return isEmpty() || recursiveIsElementValid(0);
+		return ok;*/
+		return isEmpty() || recursiveIsElementValid(0);
 	}
 	
 	private boolean recursiveIsElementValid(int index) {
@@ -149,7 +149,7 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 		// De même avec le fils de gauche
 		if (indexLeft(index)<this.currentSize) result &= ((this.array.get(index).compareTo(this.array.get(indexLeft(index)))<=0) && (this.recursiveIsElementValid(indexLeft(index))));
 		return result;
-	} */
+	}
 	
 	@Override
 	public int size() {
@@ -177,7 +177,7 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 			} else {
 				E lastItem = this.array.get(--this.currentSize);
 				this.arraySet(index, lastItem);
-				if (lastItem.compareTo(this.array.get(this.indexParent(index))) < 0) 
+				if (lastItem.compareTo(this.array.get(this.indexParent(index))) <= 0) 
 					this.percolateUp(index);
 				else 
 					this.percolateDown(index);

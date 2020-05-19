@@ -26,10 +26,6 @@ public class DijkstraTest {
     // List of arcs in the graph, a2b is the arc from node A (0) to B (1).
     @SuppressWarnings("unused")
     private static Arc a2b, a2c, a2e, b2c, c2d_1, c2d_2, c2d_3, c2a, d2a, d2e, e2d, f2e;
-
-    // Some paths...
-    private static Path emptyPath, singleNodePath, shortPath, longPath, loopPath, longLoopPath,
-            invalidPath;
     
     // Some graphs...
     private static Graph notConnectedGraph, defaultGraph, singleNodeGraph, emptyGraph;

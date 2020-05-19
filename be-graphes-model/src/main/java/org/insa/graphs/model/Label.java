@@ -25,7 +25,7 @@ public class Label implements Comparable<Label> {
 	private boolean marked;
 	
 	// Coût : valeur courante du plus court chemin depuis l'origine vers le sommet.
-	private double cost;
+	protected double cost;
 	
 	// Père : correspond au sommet précédent sur le chemin correspondant au plus court chemin courant. Afin de reconstruire le chemin à la fin de l'algorithme, mieux vaut stocker l'arc plutôt que seulement le père.
 	private Arc parent;
@@ -44,6 +44,11 @@ public class Label implements Comparable<Label> {
      * @return The cost of the current shortest path from the origin to this node.
     */
 	public double getCost() { return this.cost; }
+	
+	/**
+     * @return The cost of the current shortest path from the origin to this node + the estimated cost to the destination if AStar.
+    */
+	public double getTotalCost() { return this.getCost(); }
 
 	/**
      * @return The previous node in the current shortest path.
@@ -66,6 +71,6 @@ public class Label implements Comparable<Label> {
 	public void setParent(Arc newParent) { this.parent = newParent; }
 	
 	public int compareTo(Label other) {
-        return Double.compare(this.getCost(), other.getCost());		
+        return Double.compare(this.getTotalCost(), other.getTotalCost());		
 	}
 }
