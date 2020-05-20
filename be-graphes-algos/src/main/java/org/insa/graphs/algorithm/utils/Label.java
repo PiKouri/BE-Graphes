@@ -1,5 +1,7 @@
-package org.insa.graphs.model;
-// import java.util.ArrayList;
+package org.insa.graphs.algorithm.utils;
+
+import org.insa.graphs.model.Node;
+import org.insa.graphs.model.Arc;
 
 public class Label implements Comparable<Label> {
 	
@@ -70,7 +72,11 @@ public class Label implements Comparable<Label> {
 	 */
 	public void setParent(Arc newParent) { this.parent = newParent; }
 	
+	/**
+	 * Compares two labels
+	 */
 	public int compareTo(Label other) {
-        return Double.compare(this.getTotalCost(), other.getTotalCost());		
+		int cmp = Double.compare(this.getTotalCost(), other.getTotalCost());
+        return (cmp == 0) ? Double.compare(this.getCost(), other.getCost()) : cmp;		
 	}
 }
