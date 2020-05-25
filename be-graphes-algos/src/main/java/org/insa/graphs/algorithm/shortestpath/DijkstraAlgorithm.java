@@ -83,8 +83,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 			Node x = heap.deleteMin().getCurrentNode();
 			
 			//Display validity of the heap
-			if (INFOS) if(heap.isValid()) System.out.println("	Valid heap");
-			else {
+			if(heap.isValid()) { if (INFOS)  System.out.println("	Valid heap");
+			} else {
 				if (INFOS) System.out.println("	Invalid heap -> STOP");
 				break;
 			} 
@@ -94,7 +94,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 			notifyNodeMarked(x);
 			
 			// If destination Node is marked, we stop the algorithm
-			if (x == d) break;
+			if (x.getId() == d.getId()) break;
 			
 			@SuppressWarnings("unused")
 			int nbSuccesseursExplores = 0;
@@ -152,7 +152,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	// The destination has been found, notify the observers.
             notifyDestinationReached(d);
             
-        	while (i != s) {
+        	while (i.getId() != s.getId()) {
         		labelI = listLabels[i.getId()];
         		Arc arcI = labelI.getParent();
         		arcs.add(arcI);
